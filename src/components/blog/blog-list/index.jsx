@@ -42,6 +42,20 @@ if (response.ok){
   }
 }
 
+handleDelete = async (canc) => {
+      try {
+        await fetch(
+          `${this.apiUrl}/cart/${canc}`,
+          {
+            method: "DELETE",
+           
+          }
+        )
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
 addCart = async (name, price, quantity, productId) => {
 
   try {
@@ -126,6 +140,9 @@ componentDidUpdate = (prevProps, prevState) => {
 <p>Name: {cart.name}</p>
 <p>Price: {cart.price}</p>
 <p>Quantity: {cart.quantity}</p>
+<Button variant="danger" type="submit" className="mx-2" onClick={()=>{this.handleDelete(cart.id)}}>
+        Delete
+      </Button>
 </Col>
 ))}
 </Row>
