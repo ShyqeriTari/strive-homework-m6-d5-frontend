@@ -6,21 +6,59 @@ import { Link } from "react-router-dom";
 
 export default class BlogList extends Component {
 
-state = {blogs: []}
+state = {blogs: [], cart: []}
 
 apiUrl = process.env.REACT_APP_BLOGS
 
 fetchData = async () => {
   try {
 
-    const response = await fetch(`${this.apiUrl}/blogs`)
+    const response = await fetch(`${this.apiUrl}/product?limit=5,11`)
     const data = await response.json()
 
 if (response.ok){
-    this.setState({blogs:data})
+    this.setState({...this.state.cart, blogs:data})
     console.log(data)
     console.log(this.state.blogs)
 }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+fetchCart = async () => {
+  try {
+
+    const response = await fetch(`${this.apiUrl}/cart`)
+    const data = await response.json()
+
+if (response.ok){
+    this.setState({...this.state.blogs, cart:data})
+    console.log(data)
+    console.log(this.state.cart)
+}
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+addCart = async (name, price, quantity, productId) => {
+
+  try {
+    await fetch(
+      `${this.apiUrl}/cart`,
+      {
+        method: "POST",
+        body: JSON.stringify({"name": name,
+        "price": price, 
+        "quantity": quantity, 
+        "productId":productId}),
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    )
+    
   } catch (error) {
     console.log(error)
   }
@@ -45,6 +83,7 @@ downloadData= (blogId) =>  {
 
 componentDidMount = () => {
   this.fetchData()
+  this.fetchCart()
 }
 
 componentDidUpdate = (prevProps, prevState) => {
@@ -72,11 +111,25 @@ componentDidUpdate = (prevProps, prevState) => {
           <Button>Edit</Button>
           </Link>
 
-          <Button style={{marginLeft: "20px"}} variant="success" onClick={()=> {this.downloadData(blog.id)}}>Download</Button>
+          <Button style={{marginLeft: "15px"}} variant="success" onClick={()=> {this.downloadData(blog.id)}}>Download</Button>
+          <Button style={{marginLeft: "15px"}} onClick={()=> {this.addCart(blog.name, blog.price, 3, blog.id)}} onKeyUp={()=> this.fetchCart()}>add</Button>
      
             </Col>
            ))
   }
+
+  <h1 className="mt-5 mb-3">CART</h1>
+<Row>
+
+{this.state.cart.map(cart =>(
+<Col key={cart.id}>
+<p>Name: {cart.name}</p>
+<p>Price: {cart.price}</p>
+<p>Quantity: {cart.quantity}</p>
+</Col>
+))}
+</Row>
+
       </Row>
       </>
     );
